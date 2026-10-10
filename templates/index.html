@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+
+{% block title %}Главная — Обзор{% endblock %}
+
+{% block content %}
+<section class="dashboard">
+    <div class="dashboard-header">
+        <h1>Ваш трекер</h1>
+        <a href="{{ url_for('create') }}" class="btn btn-primary">+ Создать новое</a>
+    </div>
+
+    <div class="tabs-nav">
+        <a href="{{ url_for('index', tab='task', status=status_filter) }}" 
+           class="tab-link {{ 'active' if active_tab == 'task' else '' }}">
+            Задачи 
+            <span class="badge">{{ counts_map.get('task', 0) }}</span>
+        </a>
+        <a href="{{ url_for('index', tab='forecast', status=status_filter) }}" 
+           class="tab-link {{ 'active' if active_tab == 'forecast' else '' }}">
+            Прогнозы 
+            <span class="badge">{{ counts_map.get('forecast', 0) }}</span>
+        </a>
+    </div>
+
+    <div class="filters-bar">
+        <span>Статус:</span>
+        <a href="{{ url_for('index', tab=active_tab, status='all') }}" 
+           class="filter-tag {{ 'active' if status_filter == 'all' else '' }}">Все</a>
+        <a href="{{ url_for('index', tab=active_tab, status='pending') }}" 
+           class="filter-tag {{ 'active' if status_filter == 'pending' else '' }}">В процессе</a>
+        <a href="{{ url_for('index', tab=active_tab, status='completed') }}" 
+           class="filter-tag {{ 'active' if status_filter == 'completed' else '' }}">Завершённые</a>
+    </div>
+
+    <div class="items-grid">
+        {% if items %}
+            {% for item in items %}
+                <article class="item-card status-{{ item.status }}">
+                    <header class="card-header">
+                        {% if item.category_name %}
+                            <span class="category-pill">{{ item.category_name }}</span>
+                        {% endif %}
+                        <span class="status-label status-{{ item.status }}">
+                            {% if item.status == 'pending' %}В процессе
+                            {% elif item.status == 'completed' %}Выполнено / Сбылось
+                            {% elif item.status == 'failed' %}Провалено
+                            {% else %}{{ item.status }}{% endif %}
+                        </span>
+                    </header>
+
+                    <h3 class="card-title">
+                        <a href="{{ url_for('item_detail', item_id=item['id']) }}">{{ item['title'] }}</a>
+                    </h3>
+
+                    {% if item.description %}
+                        <p class="card-desc">{{ item.description }}</p>
+                    {% endif %}
+
+                    {% if item.type == 'forecast' and item.target_condition %}
+                        <div class="condition-box">
+                            <small><strong>Критерий:</strong> {{ item.target_condition }}</small>
+                        </div>
+                    {% endif %}
+
+                    <footer class="card-footer">
+                        <span class="date-info">
+                            {% if item.target_date %}
+                                Срок: {{ item.target_date.strftime('%d.%m.%Y %H:%M') }}
+                            {% else %}
+                                Без срока
+                            {% endif %}
+                        </span>
+                        <a href="{{ url_for('item_detail', item_id=item['id']) }}" class="card-action-link">Подробнее &rarr;</a>
+                    </footer>
+                </article>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <p>Нет записей в этом разделе.</p>
+                <a href="{{ url_for('create') }}" class="btn btn-secondary">Добавить первую запись</a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

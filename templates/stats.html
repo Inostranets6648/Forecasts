@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+
+{% block title %}Статистика и Аналитика{% endblock %}
+
+{% block content %}
+<section class="stats-dashboard">
+    <h1>Аналитика активности</h1>
+
+    <div class="stats-overview-grid">
+        <div class="metric-card">
+            <h3>Задачи</h3>
+            <div class="metric-value">{{ task_rate }}%</div>
+            <p class="metric-subtitle">Успешно завершено</p>
+            <ul class="metric-breakdown">
+                <li>Всего: <strong>{{ data.task.total }}</strong></li>
+                <li>Выполнено: <strong>{{ data.task.completed }}</strong></li>
+                <li>В работе: <strong>{{ data.task.pending }}</strong></li>
+            </ul>
+        </div>
+
+        <div class="metric-card">
+            <h3>Прогнозы</h3>
+            <div class="metric-value">{{ forecast_rate }}%</div>
+            <p class="metric-subtitle">Точность (сбылось)</p>
+            <ul class="metric-breakdown">
+                <li>Всего: <strong>{{ data.forecast.total }}</strong></li>
+                <li>Сбылось: <strong>{{ data.forecast.completed }}</strong></li>
+                <li>Не сбылось: <strong>{{ data.forecast.failed }}</strong></li>
+                <li>В ожидании: <strong>{{ data.forecast.pending }}</strong></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="categories-section">
+        <h2>Распределение по категориям</h2>
+        {% if categories_summary %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Категория</th>
+                        <th>Количество записей</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in categories_summary %}
+                        <tr>
+                            <td>{{ row.category_name }}</td>
+                            <td>{{ row.total_items }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>Данных по категориям пока нет.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

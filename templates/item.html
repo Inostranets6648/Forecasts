@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ item.title }} — Детали{% endblock %}
+
+{% block content %}
+<section class="item-detail-view">
+    <div class="item-header">
+        <a href="{{ url_for('index', tab=item.type) }}" class="back-link">&larr; Назад к списку</a>
+        <span class="badge-type badge-type-{{ item.type }}">
+            {{ 'Задача' if item.type == 'task' else 'Прогноз' }}
+        </span>
+    </div>
+
+    <div class="status-action-bar">
+        <span>Текущий статус: <strong>{{ item.status }}</strong></span>
+        <form method="POST" action="{{ url_for('update_status', item_id=item.id) }}" class="status-form">
+            {% if item.type == 'task' %}
+                <button type="submit" name="status" value="completed" class="btn btn-success">Выполнено</button>
+                <button type="submit" name="status" value="pending" class="btn btn-secondary">В процессе</button>
+                <button type="submit" name="status" value="cancelled" class="btn btn-danger">Отменить</button>
+            {% else %}
+                <button type="submit" name="status" value="completed" class="btn btn-success">Сбылся</button>
+                <button type="submit" name="status" value="failed" class="btn btn-danger">Не сбылся</button>
+                <button type="submit" name="status" value="pending" class="btn btn-secondary">Ожидает</button>
+            {% endif %}
+        </form>
+    </div>
+
+    <form method="POST" action="{{ url_for('item_detail', item_id=item.id) }}" class="edit-form">
+        <div class="form-group">
+            <label for="title">Название</label>
+            <input type="text" id="title" name="title" value="{{ item.title }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Описание</label>
+            <textarea id="description" name="description" rows="4">{{ item.description or '' }}</textarea>
+        </div>
+
+        {% if item.type == 'forecast' %}
+        <div class="form-group">
+            <label for="target_condition">Критерий сбываемости</label>
+            <input type="text" id="target_condition" name="target_condition" value="{{ item.target_condition or '' }}">
+        </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="target_date">{{ 'Срок исполнения (дедлайн)' if item.type == 'task' else 'Дата события' }}</label>
+            <input type="datetime-local" id="target_date" name="target_date" 
+                   value="{{ item.target_date.strftime('%Y-%m-%dT%H:%M') if item.target_date else '' }}">
+        </div>
+
+        <div class="meta-info">
+            <p><small>Категория: {{ item.category_name or 'Не указана' }}</small></p>
+            <p><small>Создано: {{ item.created_at.strftime('%d.%m.%Y %H:%M') if item.created_at else '—' }}</small></p>
+            {% if item.completed_at %}
+                <p><small>Завершено: {{ item.completed_at.strftime('%d.%m.%Y %H:%M') }}</small></p>
+            {% endif %}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+        </div>
+    </form>
+
+    <div class="danger-zone">
+        <form method="POST" action="{{ url_for('delete_item', item_id=item.id) }}" onsubmit="return confirm('Удалить эту запись безвозвратно?');">
+            <button type="submit" class="btn btn-delete">Удалить запись</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+
+{% block title %}Новая запись{% endblock %}
+
+{% block content %}
+<section class="form-container">
+    <h2>Создание записи</h2>
+
+    <form method="POST" action="{{ url_for('create') }}" class="create-form">
+        <div class="form-group">
+            <label class="form-label">Тип записи</label>
+            <div class="radio-toggle">
+                <label>
+                    <input type="radio" name="type" value="task" checked id="type-task">
+                    <span>Задача</span>
+                </label>
+                <label>
+                    <input type="radio" name="type" value="forecast" id="type-forecast">
+                    <span>Прогноз</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="title">Название *</label>
+            <input type="text" id="title" name="title" required placeholder="Например: Сдать финальный проект">
+        </div>
+
+        <div class="form-group">
+            <label for="description">Описание</label>
+            <textarea id="description" name="description" rows="3" placeholder="Дополнительные детали..."></textarea>
+        </div>
+
+        <div class="form-group" id="forecast-condition-group" style="display: none;">
+            <label for="target_condition">Критерий сбываемости (для прогноза)</label>
+            <input type="text" id="target_condition" name="target_condition" placeholder="При каком условии прогноз считается сбывшимся?">
+        </div>
+
+        <div class="form-group">
+            <label for="category_name">Категория</label>
+            <input type="text" list="categories-list" id="category_name" name="category_name" placeholder="Выберите или введите новую">
+            <datalist id="categories-list">
+                {% for cat in categories %}
+                    <option value="{{ cat.name }}">
+                {% endfor %}
+            </datalist>
+        </div>
+
+        <div class="form-group">
+            <label for="target_date" id="date-label">Срок исполнения</label>
+            <div class="quick-dates">
+                <button type="button" class="date-chip" data-days="0" data-hours="4">Сегодня вечером</button>
+                <button type="button" class="date-chip" data-days="1">Завтра</button>
+                <button type="button" class="date-chip" data-days="3">+3 дня</button>
+                <button type="button" class="date-chip" data-days="7">+1 неделя</button>
+                <button type="button" class="date-chip" data-days="30">+1 месяц</button>
+            </div>
+            <input type="datetime-local" id="target_date" name="target_date">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Создать</button>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Отмена</a>
+        </div>
+    </form>
+</section>
+
+{% endblock %}
